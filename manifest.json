@@ -1,5 +1,5 @@
 {
-  "name": "Search on Social Media",
+  "name": "Super Creeps Search",
   "version": "2.0",
   "description": "Search Social Media Platforms by highlighted text",
   "permissions": ["activeTab", "declarativeContent", "contextMenus", "tabs", "storage", "https://stackoverflow.com/*"],
@@ -8,20 +8,29 @@
     "scripts": ["background.js"],
     "persistent": false
   },
+  "commands": {
+    "super-creep": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Super Creep Keyboard Shortcut"
+    }
+  },
   "page_action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "images/icon.png",
-      "32": "images/icon.png",
-      "48": "images/icon.png",
-      "128": "images/icon.png"
+      "16": "images/icon16.png",
+      "32": "images/icon32.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
     }
   },
   "icons": {
-    "16": "images/lenny.png",
-    "32": "images/lenny.png",
-    "48": "images/lenny.png",
-    "128": "images/lenny.png"
+    "16": "images/icon16.png",
+    "32": "images/icon32.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
   },
   "manifest_version": 2
 }
