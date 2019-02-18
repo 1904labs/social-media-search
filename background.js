@@ -148,14 +148,61 @@ function searchStackOverflow(name, address) {
     });
 }
 
-// Create the right-click Menu
-chrome.contextMenus.create({
-    id: "mediaContextMenu",
-    title: "Search Social Media Sites",
-    contexts: ["selection"]
-});
+// Create the right-click menu on initialization
+chrome.runtime.onInstalled.addListener(function() {
+    chrome.contextMenus.create({
+        "id": "mediaContextMenu",
+        "title": "Search Social Media Sites",
+        "contexts": ["selection"]
+    });
+  });
 
 // Add EventListener for the Right-Clicked contextMenu.
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
     openSocialMediaSites(info.selectionText);
 });
+
+chrome.commands.onCommand.addListener(function (command) {
+    if (command === "super-creep") {
+        chrome.tabs.executeScript({
+            code: `(${getSelectionText.toString()})()`,
+            // We should inject into all frames, because the user could have made their
+            // selection within any frame (like an iFrame), or in multiple frames on the same page.
+            allFrames: true,
+            matchAboutBlank: true
+        }, function (results) {
+            let selectedText = results.reduce(function (sum, value) {
+                if (value) {
+                    if (sum) {
+                        // Alert the user that things are selected in more than one frame.
+                        // And show them what we are searching on. 
+                        alert(`Multiple things have been selected. 
+                        Opening super creep search on selection "${value}"`)
+                    }
+                    return value;
+                }
+                return sum;
+            }, '');
+            openSocialMediaSites(selectedText);
+        })
+    }
+});
+
+// This seems like we should just be able to use window.getSelection().toString();
+// But this won't work in the case where we are pulling the selection from an input or text area
+// See https://stackoverflow.com/questions/5379120/get-the-highlighted-selected-text & https://stackoverflow.com/questions/46752567/how-to-get-selected-text-in-the-background-script-from-the-active-tab-after-a-h?rq=1
+function getSelectionText() {
+    let text = "";
+    let activeEl = document.activeElement;
+    let activeElTagName = activeEl ? activeEl.tagName.toLowerCase() : null;
+    if (
+        (activeElTagName == "textarea") || (activeElTagName == "input" &&
+        /^(?:text|search|password|tel|url)$/i.test(activeEl.type)) &&
+        (typeof activeEl.selectionStart == "number")
+    ) {
+        text = activeEl.value.slice(activeEl.selectionStart, activeEl.selectionEnd);
+    } else if (window.getSelection) {
+        text = window.getSelection().toString();
+    }
+    return text;
+}
